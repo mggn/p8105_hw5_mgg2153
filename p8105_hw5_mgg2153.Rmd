@@ -101,3 +101,14 @@ homicide_df =
   filter(city_state != "Tulsa_AL") %>% 
   nest(data = resolved)
 ```
+
+
+## Problem 2
+
+First, I'll start by creating a dataframe using the list.files command:
+
+```{r}
+goal_spaghetti = 
+list.files(path = "./data_hw5", full.names=FALSE)%>%
+  tibble::enframe(name = NULL)
+```
