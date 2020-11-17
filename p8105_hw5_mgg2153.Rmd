@@ -109,6 +109,24 @@ First, I'll start by creating a dataframe using the list.files command:
 
 ```{r}
 goal_spaghetti = 
-list.files(path = "./data_hw5", full.names=FALSE)%>%
+list.files(path = "./hw5_data", full.names=FALSE)%>%
   tibble::enframe(name = NULL)
+
+#am I doing this right? lol we shall see
+```
+
+It appears that this created a dataframe with no variables?
+LOL because I was typing data_hw5 instead of hw5_data kill me
+
+```{r}
+goal_spaghetti_df =
+  goal_spaghetti %>%
+  mutate(
+    data = map(value, ~read_csv(str_c("./hw5_data/", .x)))
+  ) %>%
+  unnest(cols = data) %>%
+  separate(value, into=c("arm", "participant_id",sep = "_"))%>%
+  mutate(subject_id = str_replace(participant_id, ".csv", ""))
+ 
+
 ```
