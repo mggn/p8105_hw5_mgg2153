@@ -126,7 +126,8 @@ goal_spaghetti_df =
   ) %>%
   unnest(cols = data) %>%
   separate(value, into=c("arm", "participant_id",sep = "_"))%>%
-  mutate(subject_id = str_replace(participant_id, ".csv", ""))
+  mutate(participant_id = str_replace(participant_id, ".csv", "")) %>%
+ 
  
 
 ```
