@@ -125,7 +125,7 @@ goal_spaghetti_df =
     data = map(value, ~read_csv(str_c("./hw5_data/", .x)))
   ) %>%
   unnest(cols = data) %>%
-  separate(value, into=c("arm", "participant_id",sep = "_"))%>%
+  separate(value, into=c("arm", "participant_id"))%>%
   mutate(participant_id = str_replace(participant_id, ".csv", "")) %>%
  
  
