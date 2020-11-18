@@ -188,12 +188,17 @@ sim_power = function(n = 30, mu, sigma = 5) {
       select(estimate, p.value)
 
 }
+```
 
+```{r}
 #generate 5000 models
 
 output = rerun(5000, sim_power(30, 0, 5)) %>%
   bind_rows()
 
+```
+
+```{r}
 #repeat for mu = 1-6
 
 sim_results = 
@@ -201,7 +206,7 @@ sim_results =
     mu = c(0, 1, 2, 3, 4, 5, 6)
   )%>%
   mutate(
-    output_list = map(.x = mu, ~rerun(5000, sim_power(mu = .x))),
+    output_list = map(.x = mu, ~rerun(50, sim_power(mu = .x))),
     output_df = map(output_list, bind_rows)
   )%>%
   unnest(output_df) %>%
@@ -209,4 +214,17 @@ sim_results =
 
 head(sim_results)
   
+```
+
+```{r}
+reject_plot =
+  sim_results %>%
+  group_by(mu) %>%
+  count(p.value < 0.05)%>%
+  mutate(
+    power = n/sum(n)
+  )%>%
+  janitor::clean_names()%>% #p_value becomes p_value_0_05 and is boolean
+  filter(p_value_0_05 == TRUE)
+
 ```
