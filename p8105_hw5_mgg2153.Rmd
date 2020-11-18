@@ -206,5 +206,7 @@ sim_results =
   )%>%
   unnest(output_df) %>%
   select(-output_list)
+
+head(sim_results)
   
 ```
