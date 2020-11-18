@@ -156,8 +156,12 @@ goal_spaghetti_df %>%
    title = "Observations on each subject over time by treatment arm",
    caption = "Spaghetti plot"
   )+
-  facet_grid(~arm)+
+  facet_grid(.~arm)+
   theme_bw()+
   theme(legend.position = "none", plot.title = element_text(size = 11))
 
 ```
+Looks like the control group has relatively "stable" measures versus the experimental group seems so have 
+a trend that is increasing over time
+
+
