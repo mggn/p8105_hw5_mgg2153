@@ -7,6 +7,7 @@ output: html_document
 
 ```{r setup, message = FALSE}
 library(tidyverse)
+library(patchwork)
 ```
 
 ## Problem 1, as discussed in the live session from 11/10/2020
@@ -79,8 +80,8 @@ results_df %>%
 ```{r, error = TRUE}
 city_prop_test = function(df) {
   
-  n_unsovled ...
-  n_total ... 
+ # n_unsovled ...
+  #n_total ... 
   
   prop.test(.....)
   
@@ -101,7 +102,7 @@ homicide_df =
 ```
 
 
-## Problem 2
+## Problem 2: Data from a longitudinal study
 
 First, I'll start by creating a dataframe using the list.files command and then turning it
 into a dataframe using tibble::enframe :
@@ -115,7 +116,7 @@ list.files(path = "./hw5_data", full.names=FALSE)%>%
 Now that has created a sort of shell for the data. I called it "goal_spaghetti" because at the 
 end of this question, we are making a spaghetti plot. The next step is to read in the data, iterating
 over the separate csv files to create a dataframe. After mapping the data I unnested, created variables
-"arm" and "participant_id," and then pivoted longer to create a tidy dataset, where week is a variable:
+"arm" and "participant_id," and then pivoted longer to create a tidy dataset for plotting:
 
 ```{r message = FALSE}
 goal_spaghetti_df =
@@ -135,7 +136,7 @@ goal_spaghetti_df =
  
 ```
 
-Now we get to the goal of this problem: spaghetti! (plots)
+### Now we get to the goal of this problem: spaghetti! (plots)
 
 ```{r}
 goal_spaghetti_df %>%
@@ -159,30 +160,35 @@ goal_spaghetti_df %>%
   theme(plot.title = element_text(size = 11))
 
 ```
-I used facet grid in the plot to separate participants by treatment arm with the goal of improving
-graph readability
-Looks like the control group has relatively "stable" measures versus the experimental group seems so have 
-a trend that is increasing over time
 
-## Problem 3 lol
+
+I used facet grid in the plot to separate participants by treatment arm with the goal of improving
+graph readability. It looks like the control group has relatively "stable" measures, versus the experimental group 
+seems so have a trend that is increasing over time. Whatever the experimental arm is, it seems to be having
+an effect on the observation that positvely increases over the study span.
+
+## Problem 3: Simulation exploring power in a one sample t-test
+
+The goal here is to create a function where sample size, n, is fixed as 30; mean,
+represented as mu, is the input, and sigma, the standard deviation, is fixed at 5.
 
 ```{r}
 set.seed(1)
 
-sim_power = function(n = 30, mu, sigma = 5) {
+sim_power = function(n = 30, mu, sigma = 5) { #this line fixes the values of n and sigma
   
   sim_data = tibble(
-    x = rnorm(n = n, mean = mu, sd = sigma)
+    x = rnorm(n = n, mean = mu, sd = sigma) #define x as sampling from a normal dist
   )
   
-  sim_data %>%
+  sim_data %>% #in this portion of the function, we are getting estimated means and sds
     summarize(
       mu = mean(x),
       sigma = sd(x)
     )
   
  
-    sim_data %>%
+    sim_data %>% #and here we are creating a tidy table of the outputs of interest
       t.test() %>%
       broom::tidy() %>% 
       select(estimate, p.value)
@@ -190,13 +196,21 @@ sim_power = function(n = 30, mu, sigma = 5) {
 }
 ```
 
+Great, we have a function. I'd like to take a moment here to thank David J. Malan
+for discussing functions in C. Functions in c are the worst but has made this process
+slightly more straightforward.
+
+In the next chunk, we run 5000 simulations of the function, sim_power, that was specified above:
+
 ```{r}
-#generate 5000 models
 
 output = rerun(5000, sim_power(30, 0, 5)) %>%
   bind_rows()
 
+head(output)
 ```
+
+That worked-- so let's repeat it for imputs of mu ranging from 0-6
 
 ```{r}
 #repeat for mu = 1-6
@@ -215,6 +229,13 @@ sim_results =
 head(sim_results)
   
 ```
+Great-- that also worked. Of note: "p.value" variable name isn't in proper form,
+so in the next code chunk we will janitor::clean_names, and... 
+
+### create the plot of mu (population value) and power
+
+P-value is restricted to where it is less than 0.05
+because at an alpha of 0.05, a p-value of less than 0.05 is when the null is rejected:
 
 ```{r}
 reject_plot =
@@ -227,30 +248,53 @@ reject_plot =
   janitor::clean_names()%>% #p_value becomes p_value_0_05 and is boolean
   filter(p_value_0_05 == TRUE) %>%
   ggplot(aes(x = mu, y = power))+
-  geom_point(color = "magenta")+
-  geom_smooth(se = FALSE)+
-  theme_bw()
+  geom_point(color = "blue")+
+  geom_smooth(alpha = .5, se = FALSE)+
+  theme_bw()+
+  labs(
+    title = "μ vs. power",
+    x = "μ",
+    y = "power"
+  )
 
 ```
 
+The plot is logarithmic, and flattens out at power value of 1. This makes sense, because
+power is the conditional probability:
 
-Plot of average estimate of mu hat and true value of mu 
+**P(reject the null|the null is false)**
+
+And probabilities range from 0-1. Additionally, we can see that as μ increases, so does power.
+Holding all else constant (ie, fixing sample size), we can see that as the effect size increases,
+so does power. They have a direct relationship.
+
+
+### Next: plot of average estimate of mu hat and true value of mu 
 
 ```{r}
+#for the entire dataset
+avg_all_data = 
 sim_results %>%
   group_by(mu)%>%
-  summarize(mean_mu_hat = mean(estimate))%>%
+  summarize(mean_mu_hat = mean(estimate))%>% #take mean of estimated mu
   ggplot(aes(x = mu, y = mean_mu_hat))+
   geom_point()+
   geom_line()+
-  theme_bw()
+  theme_bw()+
+    labs(
+    title = "true value of μ vs. average estimate of μ(hat) where null was rejected",
+    x = "true value of μ",
+    y =  "average estimate of μ(hat)"
+  )
 
 ```
 
-Similar plot, but where the null was rejected
+### Similar plot, but where the null was rejected
 
 ```{r}
- sim_results %>%
+ 
+avg_reject_data =
+sim_results %>%
   janitor::clean_names()%>% #p value become p_value
   filter(p_value < 0.05) %>%
   group_by(mu) %>%
@@ -258,6 +302,11 @@ Similar plot, but where the null was rejected
   ggplot(aes(x = mu, y = mean_mu_hat_reject))+
   geom_point()+
   geom_line(se = FALSE)+
-  theme_bw()
+  theme_bw()+
+  labs(
+    title = "true value of μ vs. average estimate of μ(hat) where null was rejected",
+    x = "true value of μ",
+    y =  "average estimate of μ(hat)"
+  )
 
 ```
