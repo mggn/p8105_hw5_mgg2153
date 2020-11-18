@@ -126,8 +126,38 @@ goal_spaghetti_df =
   ) %>%
   unnest(cols = data) %>%
   separate(value, into=c("arm", "participant_id"))%>%
-  mutate(participant_id = str_replace(participant_id, ".csv", ""))
+  mutate(participant_id = str_replace(participant_id, ".csv", ""))%>%
+  pivot_longer(
+   week_1:week_8,
+   names_to = "week",
+   names_prefix = "week_", 
+   values_to = "obs_value"
+  )
  
- 
+
+```
+
+Now we get to the goal of this problem: spaghetti! (plots)
+
+```{r}
+goal_spaghetti_df %>%
+  mutate(
+    arm = recode(arm,
+      con = "Control",
+      exp = "Experimental"
+    )
+  ) %>%
+  ggplot(aes(x = week, y = obs_value, group = participant_id, color = participant_id))+
+  geom_point()+
+  geom_path()+
+  labs(
+   x = "Week number",
+   y = "Observation value",
+   title = "Observations on each subject over time by treatment arm",
+   caption = "Spaghetti plot"
+  )+
+  facet_grid(~arm)+
+  theme_bw()+
+  theme(legend.position = "none", plot.title = element_text(size = 11))
 
 ```
