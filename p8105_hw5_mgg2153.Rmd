@@ -164,4 +164,34 @@ goal_spaghetti_df %>%
 Looks like the control group has relatively "stable" measures versus the experimental group seems so have 
 a trend that is increasing over time
 
+## Problem 3 lol
 
+```{r}
+set.seed(1)
+
+sim_power = function(n = 30, mu, sigma = 5) {
+  
+  sim_data = tibble(
+    x = rnorm(n = n, mean = mu, sd = sigma)
+  )
+  
+  sim_data %>%
+    summarize(
+      mu = mean(x),
+      sigma = sd(x)
+    )
+  
+ 
+    sim_data %>%
+      t.test() %>%
+      broom::tidy() %>% 
+      select(estimate, p.value)
+
+}
+
+#generate 5000 models
+
+output = rerun(5000, sim_power(30, 0, 5)) %>%
+  bind_rows()
+  
+```
