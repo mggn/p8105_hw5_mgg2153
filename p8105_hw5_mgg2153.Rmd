@@ -269,7 +269,7 @@ Holding all else constant (ie, fixing sample size), we can see that as the effec
 so does power. They have a direct relationship.
 
 
-### Next: plot of average estimate of mu hat and true value of mu 
+#### Next: plot of average estimate of mu hat and true value of mu (just code)
 
 ```{r}
 #for the entire dataset
@@ -279,17 +279,17 @@ sim_results %>%
   summarize(mean_mu_hat = mean(estimate))%>% #take mean of estimated mu
   ggplot(aes(x = mu, y = mean_mu_hat))+
   geom_point()+
-  geom_line()+
+  geom_line(color = "blue")+
   theme_bw()+
     labs(
-    title = "true value of μ vs. average estimate of μ(hat) where null was rejected",
+    title = "μ vs. average of μ(hat)",
     x = "true value of μ",
     y =  "average estimate of μ(hat)"
   )
 
 ```
 
-### Similar plot, but where the null was rejected
+#### Similar plot, but where the null was rejected (just code)
 
 ```{r}
  
@@ -304,12 +304,17 @@ sim_results %>%
   geom_line(se = FALSE)+
   theme_bw()+
   labs(
-    title = "true value of μ vs. average estimate of μ(hat) where null was rejected",
+    title = "μ vs. average μ(hat), null rejected",
     x = "true value of μ",
     y =  "average estimate of μ(hat)"
   )
 
 
+```
+
+### both plots together
+
+```{r}
 avg_reject_data+avg_all_data
 
 ```
