@@ -5,9 +5,8 @@ date: "11/16/2020"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, message = FALSE}
 library(tidyverse)
-knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Problem 1, as discussed in the live session from 11/10/2020
@@ -77,7 +76,6 @@ results_df %>%
 ```
 
 
-
 ```{r, error = TRUE}
 city_prop_test = function(df) {
   
@@ -105,20 +103,21 @@ homicide_df =
 
 ## Problem 2
 
-First, I'll start by creating a dataframe using the list.files command:
+First, I'll start by creating a dataframe using the list.files command and then turning it
+into a dataframe using tibble::enframe :
 
-```{r}
+```{r list_files_tibble}
 goal_spaghetti = 
 list.files(path = "./hw5_data", full.names=FALSE)%>%
   tibble::enframe(name = NULL)
-
-#am I doing this right? lol we shall see
 ```
 
-It appears that this created a dataframe with no variables?
-LOL because I was typing data_hw5 instead of hw5_data kill me
+Now that has created a sort of shell for the data. I called it "goal_spaghetti" because at the 
+end of this question, we are making a spaghetti plot. The next step is to read in the data, iterating
+over the separate csv files to create a dataframe. After mapping the data I unnested, created variables
+"arm" and "participant_id," and then pivoted longer to create a tidy dataset, where week is a variable:
 
-```{r}
+```{r message = FALSE}
 goal_spaghetti_df =
   goal_spaghetti %>%
   mutate(
@@ -134,7 +133,6 @@ goal_spaghetti_df =
    values_to = "obs_value"
   )
  
-
 ```
 
 Now we get to the goal of this problem: spaghetti! (plots)
@@ -158,9 +156,11 @@ goal_spaghetti_df %>%
   )+
   facet_grid(.~arm)+
   theme_bw()+
-  theme(legend.position = "none", plot.title = element_text(size = 11))
+  theme(plot.title = element_text(size = 11))
 
 ```
+I used facet grid in the plot to separate participants by treatment arm with the goal of improving
+graph readability
 Looks like the control group has relatively "stable" measures versus the experimental group seems so have 
 a trend that is increasing over time
 
