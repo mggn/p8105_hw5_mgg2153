@@ -228,6 +228,36 @@ reject_plot =
   filter(p_value_0_05 == TRUE) %>%
   ggplot(aes(x = mu, y = power))+
   geom_point(color = "magenta")+
-  geom_smooth(se = FALSE)
+  geom_smooth(se = FALSE)+
+  theme_bw()
+
+```
+
+
+Plot of average estimate of mu hat and true value of mu 
+
+```{r}
+sim_results %>%
+  group_by(mu)%>%
+  summarize(mean_mu_hat = mean(estimate))%>%
+  ggplot(aes(x = mu, y = mean_mu_hat))+
+  geom_point()+
+  geom_line()+
+  theme_bw()
+
+```
+
+Similar plot, but where the null was rejected
+
+```{r}
+ sim_results %>%
+  janitor::clean_names()%>% #p value become p_value
+  filter(p_value < 0.05) %>%
+  group_by(mu) %>%
+  summarize(mean_mu_hat_reject = mean(estimate)) %>%
+  ggplot(aes(x = mu, y = mean_mu_hat_reject))+
+  geom_point()+
+  geom_line(se = FALSE)+
+  theme_bw()
 
 ```
