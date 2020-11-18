@@ -193,5 +193,18 @@ sim_power = function(n = 30, mu, sigma = 5) {
 
 output = rerun(5000, sim_power(30, 0, 5)) %>%
   bind_rows()
+
+#repeat for mu = 1-6
+
+sim_results = 
+  tibble(
+    mu = c(0, 1, 2, 3, 4, 5, 6)
+  )%>%
+  mutate(
+    output_list = map(.x = mu, ~rerun(5000, sim_power(mu = .x))),
+    output_df = map(output_list, bind_rows)
+  )%>%
+  unnest(output_df) %>%
+  select(-output_list)
   
 ```
