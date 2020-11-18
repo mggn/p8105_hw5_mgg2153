@@ -309,4 +309,16 @@ sim_results %>%
     y =  "average estimate of μ(hat)"
   )
 
+
+avg_reject_data+avg_all_data
+
 ```
+
+##### *Is the sample average of μ^ across tests for which the null is rejected approximately equal to the true value of μ? Why or why not?*
+Among the tests for which the null was rejected, the true value of μ approximates the estimated mean value of μ(hat). As effect size increases,
+power increases, and from the first plot of power we saw that the effect size was greatest at μ = 6. Essentially this plot demonstrates that when
+a study is well-powered, the estimated μ will approach the true population μ. In statistics, we are trying to estimate population parameter values
+as efficiently/as well as possible
+
+ 
+ 
