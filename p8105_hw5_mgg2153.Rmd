@@ -2,7 +2,7 @@
 title: "p8105_hw5_mgg2153"
 author: "mggn"
 date: "11/16/2020"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, message = FALSE}
